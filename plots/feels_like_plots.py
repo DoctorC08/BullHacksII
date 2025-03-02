@@ -1,5 +1,5 @@
 from plots import plot_histogram
-from weather_classification import calculate_feels_like
+from weather_classification import classify_weather
 import pandas as pd
 
 teams = {
@@ -63,7 +63,7 @@ columns = [
     "Feels Like"
 ]
 
-df['Feels Like'] = df.apply(lambda row: calculate_feels_like(row['Temperature (°C)'], row['Humidity (%)'], row['Wind Speed (m/s)']), axis=1)
+df['Feels Like'] = df.apply(lambda row: classify_weather(row['Temperature (°C)'], row['Humidity (%)'], row['Wind Speed (m/s)']), axis=1)
 
 percentiles = df['Feels Like'].quantile([0.25, 0.5, 0.75])
 

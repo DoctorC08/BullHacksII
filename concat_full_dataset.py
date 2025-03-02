@@ -1,46 +1,5 @@
+from plots.weather_classification import classify_weather
 import pandas as pd
-import pybaseball as pyball
-import warnings # removing extra warnings
-warnings.simplefilter(action='ignore', category=FutureWarning)
-
-from tqdm import tqdm
-
-from weather import get_weather
-from data_cleaning import clean_data
-
-pd.set_option('display.max_columns', None)
-pd.set_option('display.max_rows', None)
-
-def time_to_decimal(time_str):
-    # Split time into hours and minutes
-    hours, minutes = map(int, time_str.split(':'))
-    # Convert minutes to a fraction of an hour and add to hours
-    return hours + (minutes / 60)
-
-
-def gather_team_data(team_abrv):
-    data = pd.DataFrame(pyball.batting_stats(2023).columns)
-    data = pyball.schedule_and_record(2023, team_abrv)
-    data['Time'] = data['Time'].apply(time_to_decimal)
-
-    data = clean_data(data)
-
-    columns=[
-            "Temperature (°C)", 
-            "Humidity (%)", 
-            "Relative Wind Direction (°)", 
-            "Precipitation (mm)", 
-            "Snow (mm)", 
-            "Wind Speed (m/s)", 
-            "COCO"
-        ]
-    data[columns] = data.apply(
-        lambda row: get_weather(row['Date'], row['Time'], row['Tm'] if row['Home_Away'] == 'Home' else row['Opp']), 
-        axis=1, 
-        result_type="expand")
-    # print(data.head(20))
-    data.to_csv(f'datasets/{team_abrv}_dataset.csv', index=False)
-
 
 teams = {
     "ARI": {"team": "Arizona Diamondbacks", "city": "Phoenix, AZ"},
@@ -72,8 +31,38 @@ teams = {
     "TBR": {"team": "Tampa Bay Rays", "city": "St. Petersburg, FL"},
     "TEX": {"team": "Texas Rangers", "city": "Arlington, TX"},
     "TOR": {"team": "Toronto Blue Jays", "city": "Toronto, ON"},
-    "WSH": {"team": "Washington Nationals", "city": "Washington, D.C."}
+    # "WSN": {"team": "Washington Nationals", "city": "Washington, D.C."},
+    # "WSH": {"team": "Washington Nationals", "city": "Washington, D.C."}
 }
 
-for team in tqdm(teams.keys()):
-    gather_team_data(team)
+all_teams = list(teams.keys())
+
+all_dataframes = []
+
+# Iterate through each team name
+for team in teams.keys():
+    # Construct the file path by inserting the team name
+    file_path = f'datasets/{team}_dataset.csv'
+    
+    # Read the CSV file into a DataFrame
+    df = pd.read_csv(file_path)
+    
+    # Optionally, add a new column to identify the team (if you want)
+    df['Team'] = team
+    
+    # Append the DataFrame to the list
+    all_dataframes.append(df)
+
+# Concatenate all the dataframes into one
+df = pd.concat(all_dataframes, ignore_index=True)
+
+columns = [
+    "Temperature (°C)", 
+    "Humidity (%)", 
+    "Wind Speed (m/s)", 
+    "Weather Classified"
+]
+
+df['Weather Classified'] = df.apply(lambda row: classify_weather(row['Temperature (°C)'], row['Humidity (%)'], row['Wind Speed (m/s)']), axis=1)
+
+df.to_csv('datasets/concated_full_dataset.csv', index=False)

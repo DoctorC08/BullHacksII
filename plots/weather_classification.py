@@ -23,3 +23,25 @@ def calculate_feels_like(temp, humidity, wind_speed):
     else:
         wind_chill = 35.74 + 0.6215 * temp - 35.75 * (wind_speed ** 0.16) + 0.4275 * temp * (wind_speed ** 0.16)
         return wind_chill
+
+def  classify_weather(temp, humidity, wind_speed):
+    feels_like = calculate_feels_like(temp, humidity, wind_speed)
+    if feels_like < 58.00642: 
+        return 0
+    elif feels_like < 65.72748:
+        return 1 
+    elif feels_like < 74.40799:
+        return 2
+    else: 
+        return 3
+    
+def  classify_weather2(temp, humidity, wind_speed):
+    feels_like = calculate_feels_like(temp, humidity, wind_speed)
+    if feels_like < 50: 
+        return 0
+    elif feels_like < 70:
+        return 1 
+    elif feels_like < 85:
+        return 2
+    else: 
+        return 3

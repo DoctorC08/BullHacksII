@@ -4,13 +4,13 @@ import pandas as pd
 basic_path = 'datasets/ARI_dataset.csv'
 
 columns = [
-    "Temperature (°C)", 
-    "Humidity (%)", 
+    # "Temperature (°C)", 
+    # "Humidity (%)", 
     # "Relative Wind Direction (°)", 
-    # "Precipitation (mm)", 
-    # "Snow (mm)", 
-    "Wind Speed (m/s)", 
-    "COCO"
+    "Precipitation (mm)", 
+    "Snow (mm)", 
+    # "Wind Speed (m/s)", 
+    # "COCO"
 ]
 
 # Read the CSV file into a DataFrame
